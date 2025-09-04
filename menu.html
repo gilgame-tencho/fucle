@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fucle</title>
   <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
   <style>
@@ -52,6 +53,7 @@
       gap: 10px;
       position: relative;
       width: fit-content;
+      word-break: break-word;
     }
 
     .link-item::before {
@@ -72,6 +74,23 @@
 
     .link-item:hover::after {
       width: calc(100% - 30px);
+    }
+
+    /* スマホ表示調整 */
+    @media (max-width: 768px) {
+      table {
+        width: 100%;
+      }
+      td {
+        padding: 8px;
+        word-break: break-word;
+      }
+      td:first-child {
+        width: 50%;
+      }
+      td:last-child {
+        width: 50%;
+      }
     }
   </style>
 </head>
