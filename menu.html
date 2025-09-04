@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fucle</title>
+  <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'ADLaM Display', sans-serif;
+      margin: 40px;
+      background: #fff;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 40px;
+    }
+
+    .container {
+      display: flex;
+      gap: 80px;
+    }
+
+    .categories, .links {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .category {
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .category::before {
+      content: "◎";
+      font-size: 1.2rem;
+    }
+
+    .link-item {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      width: fit-content;
+    }
+
+    .link-item::before {
+      content: "★";
+      font-size: 1.1rem;
+    }
+
+    .link-item::after {
+      content: "";
+      position: absolute;
+      left: 30px;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background: #333;
+      transition: width 0.3s ease;
+    }
+
+    .link-item:hover::after {
+      width: calc(100% - 30px);
+    }
+  </style>
+</head>
+<body>
+  <h1>FUCLE</h1>
+  <div class="container">
+    <div class="categories">
+      <div class="category">VORONOI DIAGRAMS</div>
+      <div class="category">TRANSFORMATIONS</div>
+      <div class="category">FRACTALS</div>
+      <div class="category">RANDOMNESS</div>
+      <div class="category">LATIN SQUARES</div>
+    </div>
+
+    <div class="links">
+      <a href="#" class="link-item">BARNACLES</a>
+      <a href="#" class="link-item">BUBBLES</a>
+      <a href="#" class="link-item">TWIRL THE WORLD</a>
+      <a href="#" class="link-item">MANDELBROT SET</a>
+      <a href="#" class="link-item">JULIA SET</a>
+      <a href="#" class="link-item">COIN HEX</a>
+      <a href="#" class="link-item">PI WALK</a>
+      <a href="#" class="link-item">MEGADOKU</a>
+    </div>
+  </div>
+</body>
+</html>
