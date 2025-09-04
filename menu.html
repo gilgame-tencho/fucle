@@ -18,15 +18,14 @@
       margin-bottom: 40px;
     }
 
-    .container {
-      display: flex;
-      gap: 80px;
+    table {
+      border-collapse: collapse;
+      width: auto;
     }
 
-    .categories, .links {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
+    td {
+      padding: 10px 40px 10px 0;
+      vertical-align: top;
     }
 
     .category {
@@ -35,6 +34,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      white-space: nowrap;
     }
 
     .category::before {
@@ -77,25 +77,39 @@
 </head>
 <body>
   <h1>FUCLE</h1>
-  <div class="container">
-    <div class="categories">
-      <div class="category">VORONOI DIAGRAMS</div>
-      <div class="category">TRANSFORMATIONS</div>
-      <div class="category">FRACTALS</div>
-      <div class="category">RANDOMNESS</div>
-      <div class="category">LATIN SQUARES</div>
-    </div>
-
-    <div class="links">
-      <a href="#" class="link-item">BARNACLES</a>
-      <a href="#" class="link-item">BUBBLES</a>
-      <a href="#" class="link-item">TWIRL THE WORLD</a>
-      <a href="#" class="link-item">MANDELBROT SET</a>
-      <a href="#" class="link-item">JULIA SET</a>
-      <a href="#" class="link-item">COIN HEX</a>
-      <a href="#" class="link-item">PI WALK</a>
-      <a href="#" class="link-item">MEGADOKU</a>
-    </div>
-  </div>
+  <table>
+    <tr>
+      <td class="category">VORONOI DIAGRAMS</td>
+      <td><a href="#" class="link-item">BARNACLES</a></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a href="#" class="link-item">BUBBLES</a></td>
+    </tr>
+    <tr>
+      <td class="category">TRANSFORMATIONS</td>
+      <td><a href="#" class="link-item">TWIRL THE WORLD</a></td>
+    </tr>
+    <tr>
+      <td class="category">FRACTALS</td>
+      <td><a href="#" class="link-item">MANDELBROT SET</a></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a href="#" class="link-item">JULIA SET</a></td>
+    </tr>
+    <tr>
+      <td class="category">RANDOMNESS</td>
+      <td><a href="#" class="link-item">COIN HEX</a></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a href="#" class="link-item">PI WALK</a></td>
+    </tr>
+    <tr>
+      <td class="category">LATIN SQUARES</td>
+      <td><a href="#" class="link-item">MEGADOKU</a></td>
+    </tr>
+  </table>
 </body>
 </html>
