@@ -10,19 +10,49 @@
       flex-direction: column;
       align-items: center;
       margin: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 20px;
     }
     #controls {
       margin-bottom: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     label {
-      margin-right: 10px;
+      margin-right: 15px;
+    }
+    input {
+      width: 60px;
+      text-align: right;
+      margin-left: 5px;
     }
     canvas {
-      border: 1px solid #444;
+      border: 2px solid #333;
+      background: #fff;
+      border-radius: 12px;
+      margin-top: 10px;
     }
     button {
-      margin-top: 10px;
-      padding: 5px 10px;
+      margin-top: 15px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #drawBtn {
+      background: #0077cc;
+      color: #fff;
+    }
+    #downloadBtn {
+      background: #28a745;
+      color: #fff;
     }
   </style>
 </head>
@@ -32,59 +62,88 @@
   <div id="controls">
     <label>
       頂点数:
-      <input type="number" id="vertices" value="6" min="3" max="20">
+      <input type="number" id="vertices" value="6" min="3" max="12">
     </label>
     <label>
       半径:
-      <input type="number" id="radius" value="100" min="10" max="300">
+      <input type="number" id="radius" value="50" min="10" max="300">
     </label>
-    <button onclick="drawPattern()">描画</button>
+    <button id="drawBtn" onclick="drawTiling()">描画</button>
   </div>
 
-  <canvas id="canvas" width="500" height="500"></canvas>
-  <button onclick="downloadImage()">画像をダウンロード</button>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <button id="downloadBtn" onclick="downloadImage()">画像をダウンロード</button>
 
   <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    function drawPattern() {
+    // 単一の正多角形を描画する
+    function drawPolygon(x, y, radius, vertices) {
+      ctx.beginPath();
+      for (let i = 0; i <= vertices; i++) {
+        const angle = (i * 2 * Math.PI) / vertices - Math.PI / 2;
+        const px = x + radius * Math.cos(angle);
+        const py = y + radius * Math.sin(angle);
+        if (i === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.closePath();
+      ctx.strokeStyle = "#0077cc";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = "rgba(0,119,204,0.08)";
+      ctx.fill();
+    }
+
+    // タイル模様を描画
+    function drawTiling() {
       const vertices = parseInt(document.getElementById("vertices").value, 10);
       const radius = parseInt(document.getElementById("radius").value, 10);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.beginPath();
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+      if (vertices === 6) {
+        // 六角形タイル
+        const dx = radius * Math.sqrt(3); // 横方向の間隔
+        const dy = radius * 1.5;          // 縦方向の間隔
 
-      for (let i = 0; i <= vertices; i++) {
-        const angle = (i * 2 * Math.PI) / vertices;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
+        for (let row = 0; row < Math.ceil(canvas.height / dy) + 1; row++) {
+          for (let col = 0; col < Math.ceil(canvas.width / dx) + 1; col++) {
+            const x = col * dx + (row % 2) * (dx / 2);
+            const y = row * dy;
+            drawPolygon(x, y, radius, vertices);
+          }
         }
+      } else if (vertices === 4) {
+        // 四角形タイル（市松）
+        const dx = radius * 2;
+        const dy = radius * 2;
+        for (let row = 0; row < Math.ceil(canvas.height / dy) + 1; row++) {
+          for (let col = 0; col < Math.ceil(canvas.width / dx) + 1; col++) {
+            const x = col * dx + radius;
+            const y = row * dy + radius;
+            drawPolygon(x, y, radius, vertices);
+          }
+        }
+      } else {
+        // その他の多角形 → 中央だけ描画（敷き詰め不可）
+        drawPolygon(canvas.width / 2, canvas.height / 2, radius, vertices);
       }
-      ctx.closePath();
-
-      ctx.strokeStyle = "#0077cc";
-      ctx.lineWidth = 2;
-      ctx.stroke();
     }
 
     function downloadImage() {
       const link = document.createElement("a");
-      link.download = "pattern.png";
+      link.download = "coin_hex_pattern.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
 
     // 初期描画
-    drawPattern();
+    drawTiling();
   </script>
 </body>
 </html>
