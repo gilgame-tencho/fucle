@@ -80,16 +80,16 @@
     @media (max-width: 768px) {
       table {
         width: 100%;
-      }
-      td {
-        padding: 8px;
-        word-break: break-word;
+        table-layout: fixed; /* ← 各セルの幅を固定比率にする */
       }
       td:first-child {
         width: 50%;
+        white-space: normal; /* ← 折り返しOKにする */
+        word-break: break-word;
       }
       td:last-child {
         width: 50%;
+        word-break: break-word;
       }
     }
   </style>
