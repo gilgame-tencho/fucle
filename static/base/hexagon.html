@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Regular Rhombs Canvas</title>
+</head>
+<body>
+<canvas id="canvas" width="1000" height="1000"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// 辺の長さ
+const side = 40;
+
+//ひし形プロパティ
+const rhombs = {
+  top_area :  { vertex1 : 30, color: '#4CAF50' },
+  side_area : { vertex1 : 75, color: '#FFC107' },
+};
+
+rhombs.top_area.rad1 = (rhombs.top_area.vertex1/2) * Math.PI / 180;
+rhombs.side_area.rad1 = (rhombs.side_area.vertex1/2) * Math.PI / 180;
+
+// 対角線の長さ
+const base = {
+  harf_width : Math.cos(rhombs.top_area.rad1) * side,
+  harf_height : Math.sin(rhombs.top_area.rad1) * side,
+}
+base.width = base.harf_width * 2;
+base.height = base.harf_height * 2;
+
+rhombs.top_area.p1 = [0,0];
+rhombs.top_area.p2 = [base.harf_width,-base.harf_height];
+rhombs.top_area.p3 = [base.width,0];
+rhombs.top_area.p4 = [base.harf_width,base.harf_height];
+
+rhombs.side_area.p1 = [0,0];
+rhombs.side_area.p2 = [base.harf_width,base.harf_height];
+rhombs.side_area.p3 = [base.harf_width,base.harf_height + side];
+rhombs.side_area.p4 = [0,side];
+
+// Draw
+function drawRhombus(target, cx, cy) {
+    // const angleB = 180 - angleA;
+    let rh = rhombs[target];
+    ctx.beginPath();
+    ctx.moveTo(cx + rh.p1[0], cy + rh.p1[1]);
+    ctx.lineTo(cx + rh.p2[0], cy + rh.p2[1]);
+    ctx.lineTo(cx + rh.p3[0], cy + rh.p3[1]);
+    ctx.lineTo(cx + rh.p4[0], cy + rh.p4[1]);
+    ctx.lineTo(cx + rh.p1[0], cy + rh.p1[1]);
+    ctx.closePath();
+    ctx.fillStyle = rh.color;
+    ctx.fill();
+}
+
+// 配置
+const rows = 20;
+const cols = 12;
+const sp = 0;
+let gx = sp;
+let gy = sp;
+for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      if(row % 2 == 0){
+        gx = sp + (col * base.width);
+        gy = row * (side + base.harf_height);
+      }else{
+        gx = sp + (col * base.width) + base.harf_width;
+        gy = row * (side + base.harf_height);
+      }
+      drawRhombus('top_area', gx, gy);
+      drawRhombus('side_area', gx, gy);
+    }
+}
+</script>
+</body>
+</html>
