@@ -5,7 +5,7 @@
 <title>Regular Rhombs Canvas</title>
 </head>
 <body>
-<canvas id="canvas" width="500" height="500"></canvas>
+<canvas id="canvas" width="1000" height="1000"></canvas>
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -13,54 +13,65 @@ const ctx = canvas.getContext('2d');
 // 辺の長さ
 const side = 40;
 
-// ラジアン変換
-function deg2rad(deg){ return deg * Math.PI / 180; }
+//ひし形プロパティ
+const rhombs = {
+  top_area :  { vertex1 : 30, color: '#4CAF50' },
+  side_area : { vertex1 : 75, color: '#FFC107' },
+};
 
-// ひし形描画関数（中心座標と2つの角度）
-function drawRhombus(cx, cy, angleA, color) {
-    const angleB = 180 - angleA;
+rhombs.top_area.rad1 = (rhombs.top_area.vertex1/2) * Math.PI / 180;
+rhombs.side_area.rad1 = (rhombs.side_area.vertex1/2) * Math.PI / 180;
+
+// 対角線の長さ
+const base = {
+  harf_width : Math.cos(rhombs.top_area.rad1) * side,
+  harf_height : Math.sin(rhombs.top_area.rad1) * side,
+}
+base.width = base.harf_width * 2;
+base.height = base.harf_height * 2;
+
+rhombs.top_area.p1 = [0,0];
+rhombs.top_area.p2 = [base.harf_width,-base.harf_height];
+rhombs.top_area.p3 = [base.width,0];
+rhombs.top_area.p4 = [base.harf_width,base.harf_height];
+
+rhombs.side_area.p1 = [0,0];
+rhombs.side_area.p2 = [base.harf_width,base.harf_height];
+rhombs.side_area.p3 = [base.harf_width,base.harf_height + side];
+rhombs.side_area.p4 = [0,side];
+
+// Draw
+function drawRhombus(target, cx, cy) {
+    // const angleB = 180 - angleA;
+    let rh = rhombs[target];
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    // 4頂点を順番に計算
-    const x0 = cx + side * Math.cos(deg2rad(angleA/2));
-    const y0 = cy - side * Math.sin(deg2rad(angleA/2));
-
-    const x1 = x0 + side * Math.cos(deg2rad(180 - angleA));
-    const y1 = y0 + side * Math.sin(deg2rad(180 - angleA));
-
-    const x2 = cx - side * Math.cos(deg2rad(angleA/2));
-    const y2 = cy + side * Math.sin(deg2rad(angleA/2));
-
-    const x3 = cx + side * Math.cos(deg2rad(180 - angleA)) - side * Math.cos(deg2rad(angleA/2));
-    const y3 = cy + side * Math.sin(deg2rad(180 - angleA)) - side * Math.sin(deg2rad(angleA/2));
-
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x1, y1);
-    ctx.lineTo(x3, y3);
-    ctx.lineTo(x2, y2);
+    ctx.moveTo(cx + rh.p1[0], cy + rh.p1[1]);
+    ctx.lineTo(cx + rh.p2[0], cy + rh.p2[1]);
+    ctx.lineTo(cx + rh.p3[0], cy + rh.p3[1]);
+    ctx.lineTo(cx + rh.p4[0], cy + rh.p4[1]);
+    ctx.lineTo(cx + rh.p1[0], cy + rh.p1[1]);
     ctx.closePath();
-    ctx.fillStyle = color;
+    ctx.fillStyle = rh.color;
     ctx.fill();
 }
 
-// 角度設定
-const thick = 72; // 緑
-const thin = 36;  // 黄
-
-// 配置（近似）
-const rows = 8;
-const cols = 8;
+// 配置
+const rows = 20;
+const cols = 12;
+const sp = 0;
+let gx = sp;
+let gy = sp;
 for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-        // 緑ひし形
-        let gx = col * side * 1.5;
-        let gy = row * side * 0.9;
-        drawRhombus(gx, gy, thick, '#4CAF50');
-
-        // 黄色ひし形は緑ひし形に隣接してずらして描画
-        let tx = gx + side * Math.cos(deg2rad(thick/2));
-        let ty = gy + side * Math.sin(deg2rad(thick/2));
-        drawRhombus(tx, ty, thin, '#FFC107');
+      if(row % 2 == 0){
+        gx = sp + (col * base.width);
+        gy = row * (side + base.harf_height);
+      }else{
+        gx = sp + (col * base.width) + base.harf_width;
+        gy = row * (side + base.harf_height);
+      }
+      drawRhombus('top_area', gx, gy);
+      drawRhombus('side_area', gx, gy);
     }
 }
 </script>
