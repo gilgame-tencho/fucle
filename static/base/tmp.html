@@ -2,96 +2,107 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Penrose Rhombi Tiling</title>
+  <title>Penrose Tiling (Rhombus, Radial)</title>
   <style>
-    body { text-align:center; font-family:sans-serif; background:#fafafa; }
-    canvas { border:1px solid #ccc; margin-top:10px; }
-    .controls { margin-top:10px; }
-    button, input { margin:0 5px; }
+    body { background:#111; color:#eee; text-align:center; font-family:sans-serif; }
+    canvas { border:1px solid #444; margin-top:10px; background:#000; }
+    .controls { margin:10px; }
   </style>
 </head>
 <body>
-  <h1>Penrose Rhombi Tiling</h1>
+  <h1>ペンローズ菱形タイル (放射状)</h1>
   <div class="controls">
     <label>サイズ: <input id="size" type="number" value="200"></label>
-    <label>反復数: <input id="steps" type="number" value="5" min="1" max="7"></label>
+    <label>反復: <input id="steps" type="number" value="5" min="1" max="7"></label>
     <button onclick="draw()">描画</button>
     <button onclick="download()">ダウンロード</button>
   </div>
   <canvas id="canvas" width="800" height="800"></canvas>
+
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const phi = (1 + Math.sqrt(5)) / 2;
 
-    class Rhomb {
-      constructor(type, x, y, angle, size) {
+    class Rhombus {
+      constructor(type, ax, ay, bx, by) {
         this.type = type; // "thin" or "thick"
-        this.x = x; this.y = y;
-        this.angle = angle;
-        this.size = size;
+        this.ax = ax; this.ay = ay;
+        this.bx = bx; this.by = by;
       }
 
+      // 分割ルール
       subdivide() {
-        const { type, x, y, angle, size } = this;
-        const newSize = size / phi;
-        const ts = [];
+        const { type, ax, ay, bx, by } = this;
+        const vx = bx - ax, vy = by - ay;
+        const len = Math.sqrt(vx*vx + vy*vy);
+        const ux = vx / len, uy = vy / len;
+        const mx = ax + vx/phi, my = ay + vy/phi;
+
         if (type === "thick") {
-          ts.push(new Rhomb("thick", x, y, angle, newSize));
-          ts.push(new Rhomb("thin",
-            x + newSize * Math.cos(angle),
-            y + newSize * Math.sin(angle),
-            angle + Math.PI / 5, newSize));
-          ts.push(new Rhomb("thick",
-            x + newSize * (1 + Math.cos(angle + Math.PI / 5)),
-            y + newSize * Math.sin(angle + Math.PI / 5),
-            angle + Math.PI / 5 - Math.PI / 10, newSize));
+          return [
+            new Rhombus("thick", bx, by, mx, my),
+            new Rhombus("thin", mx, my, ax, ay)
+          ];
         } else {
-          ts.push(new Rhomb("thick", x, y, angle, newSize));
-          ts.push(new Rhomb("thin",
-            x + newSize * Math.cos(angle),
-            y + newSize * Math.sin(angle),
-            angle - Math.PI / 5, newSize));
+          return [
+            new Rhombus("thin", ax, ay, mx, my),
+            new Rhombus("thick", mx, my, bx, by)
+          ];
         }
-        return ts;
       }
 
-      draw(ctx) {
-        const { x, y, angle, size, type } = this;
-        const alpha = (type === "thin") ? 36 : 72;
-        const rad = alpha * Math.PI / 180;
+      draw(ctx, cx, cy) {
+        const { type, ax, ay, bx, by } = this;
+        const color = (type === "thick") ? "#ff9966" : "#66ccff";
+
         ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + size * Math.cos(angle), y + size * Math.sin(angle));
-        ctx.lineTo(x + size * Math.cos(angle + rad), y + size * Math.sin(angle + rad));
-        ctx.lineTo(x + size * (Math.cos(angle) + Math.cos(angle + rad)),
-                   y + size * (Math.sin(angle) + Math.sin(angle + rad)));
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + ax, cy + ay);
+        ctx.lineTo(cx + bx, cy + by);
         ctx.closePath();
-        ctx.fillStyle = type === "thin" ? "#8ac6d1" : "#ffb4a2";
+        ctx.fillStyle = color;
         ctx.fill();
+        ctx.strokeStyle = "#222";
         ctx.stroke();
       }
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const size = +document.getElementById('size').value;
-      const steps = +document.getElementById('steps').value;
-      const cx = canvas.width / 2, cy = canvas.height / 2;
-
+    function generatePenrose(size, steps) {
       let tiles = [];
-      tiles.push(new Rhomb("thick", cx, cy, -Math.PI/2, size));
+      const cx = 0, cy = 0;
 
-      for (let i = 0; i < steps; i++) {
-        tiles = tiles.flatMap(r => r.subdivide());
+      // 初期: 厚い菱形を5枚並べて星型を作る
+      for (let i = 0; i < 5; i++) {
+        const angle1 = (i * 2 * Math.PI) / 5;
+        const angle2 = ((i+1) * 2 * Math.PI) / 5;
+        const ax = size * Math.cos(angle1), ay = size * Math.sin(angle1);
+        const bx = size * Math.cos(angle2), by = size * Math.sin(angle2);
+        tiles.push(new Rhombus("thick", ax, ay, bx, by));
       }
 
-      tiles.forEach(r => r.draw(ctx));
+      // 分割を繰り返す
+      for (let s = 0; s < steps; s++) {
+        tiles = tiles.flatMap(t => t.subdivide());
+      }
+
+      return tiles;
     }
 
-    function download(){
+    function draw() {
+      const size = +document.getElementById('size').value;
+      const steps = +document.getElementById('steps').value;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const tiles = generatePenrose(size, steps);
+      const cx = canvas.width/2, cy = canvas.height/2;
+
+      tiles.forEach(t => t.draw(ctx, cx, cy));
+    }
+
+    function download() {
       const a = document.createElement('a');
-      a.download = 'penrose_rhombi.png';
+      a.download = 'penrose_radial.png';
       a.href = canvas.toDataURL();
       a.click();
     }
