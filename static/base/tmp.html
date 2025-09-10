@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Penrose Rhombi Tiling</title>
+  <style>
+    body { text-align:center; font-family:sans-serif; background:#fafafa; }
+    canvas { border:1px solid #ccc; margin-top:10px; }
+    .controls { margin-top:10px; }
+    button, input { margin:0 5px; }
+  </style>
+</head>
+<body>
+  <h1>Penrose Rhombi Tiling</h1>
+  <div class="controls">
+    <label>サイズ: <input id="size" type="number" value="200"></label>
+    <label>反復数: <input id="steps" type="number" value="5" min="1" max="7"></label>
+    <button onclick="draw()">描画</button>
+    <button onclick="download()">ダウンロード</button>
+  </div>
+  <canvas id="canvas" width="800" height="800"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const phi = (1 + Math.sqrt(5)) / 2;
+
+    class Rhomb {
+      constructor(type, x, y, angle, size) {
+        this.type = type; // "thin" or "thick"
+        this.x = x; this.y = y;
+        this.angle = angle;
+        this.size = size;
+      }
+
+      subdivide() {
+        const { type, x, y, angle, size } = this;
+        const newSize = size / phi;
+        const ts = [];
+        if (type === "thick") {
+          ts.push(new Rhomb("thick", x, y, angle, newSize));
+          ts.push(new Rhomb("thin",
+            x + newSize * Math.cos(angle),
+            y + newSize * Math.sin(angle),
+            angle + Math.PI / 5, newSize));
+          ts.push(new Rhomb("thick",
+            x + newSize * (1 + Math.cos(angle + Math.PI / 5)),
+            y + newSize * Math.sin(angle + Math.PI / 5),
+            angle + Math.PI / 5 - Math.PI / 10, newSize));
+        } else {
+          ts.push(new Rhomb("thick", x, y, angle, newSize));
+          ts.push(new Rhomb("thin",
+            x + newSize * Math.cos(angle),
+            y + newSize * Math.sin(angle),
+            angle - Math.PI / 5, newSize));
+        }
+        return ts;
+      }
+
+      draw(ctx) {
+        const { x, y, angle, size, type } = this;
+        const alpha = (type === "thin") ? 36 : 72;
+        const rad = alpha * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + size * Math.cos(angle), y + size * Math.sin(angle));
+        ctx.lineTo(x + size * Math.cos(angle + rad), y + size * Math.sin(angle + rad));
+        ctx.lineTo(x + size * (Math.cos(angle) + Math.cos(angle + rad)),
+                   y + size * (Math.sin(angle) + Math.sin(angle + rad)));
+        ctx.closePath();
+        ctx.fillStyle = type === "thin" ? "#8ac6d1" : "#ffb4a2";
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const size = +document.getElementById('size').value;
+      const steps = +document.getElementById('steps').value;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+
+      let tiles = [];
+      tiles.push(new Rhomb("thick", cx, cy, -Math.PI/2, size));
+
+      for (let i = 0; i < steps; i++) {
+        tiles = tiles.flatMap(r => r.subdivide());
+      }
+
+      tiles.forEach(r => r.draw(ctx));
+    }
+
+    function download(){
+      const a = document.createElement('a');
+      a.download = 'penrose_rhombi.png';
+      a.href = canvas.toDataURL();
+      a.click();
+    }
+
+    draw();
+  </script>
+</body>
+</html>
