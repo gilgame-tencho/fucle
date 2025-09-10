@@ -2,47 +2,60 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Regular Rhombs</title>
+<title>Regular Rhombs Pattern</title>
 </head>
 <body>
-<canvas id="canvas" width="500" height="500"></canvas>
+<canvas id="canvas" width="600" height="600"></canvas>
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-const side = 40; // 辺の長さ
+// 辺の長さ
+const side = 40;
 
-// 角度をラジアンに変換
-function deg2rad(deg){ return deg * Math.PI / 180; }
-
-// ひし形を描く関数
+// Rhomb 描画関数（中心座標と角度指定）
 function drawRhombus(x, y, angleA, color){
     const angleB = 180 - angleA;
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.lineTo(x + side, y);
-    let x2 = x + side + side * Math.cos(deg2rad(angleB));
-    let y2 = y + side * Math.sin(deg2rad(angleB));
+    let x1 = x + side * Math.cos(deg2rad(angleA));
+    let y1 = y + side * Math.sin(deg2rad(angleA));
+    ctx.lineTo(x1, y1);
+
+    let x2 = x1 + side * Math.cos(deg2rad(angleB + angleA));
+    let y2 = y1 + side * Math.sin(deg2rad(angleB + angleA));
     ctx.lineTo(x2, y2);
+
     let x3 = x + side * Math.cos(deg2rad(angleB));
     let y3 = y + side * Math.sin(deg2rad(angleB));
     ctx.lineTo(x3, y3);
+
     ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
 }
 
-// 2種類のひし形
-const thick = 72;  // thick rhomb: 72° / 108°
-const thin = 36;   // thin rhomb: 36° / 144°
+function deg2rad(deg){ return deg * Math.PI / 180; }
 
-// 簡易タイル配置（繰り返し）
-for(let row=0; row<5; row++){
-    for(let col=0; col<5; col++){
-        const x = col * side * 1.5;
-        const y = row * side * Math.sin(deg2rad(thick)) * 2;
-        const color = (row+col)%2===0 ? '#4CAF50' : '#FFC107';
-        drawRhombus(x, y, (row+col)%2===0 ? thick : thin, color);
+// 角度設定
+const thickAngle = 72;  // 緑
+const thinAngle = 36;   // 黄
+
+// 配置用ループ（互い違い）
+const rows = 8;
+const cols = 8;
+
+for(let row=0; row<rows; row++){
+    for(let col=0; col<cols; col++){
+        // 緑ひし形（thick）
+        let xg = col * side * 1.5;
+        let yg = row * side * Math.sin(deg2rad(thickAngle));
+        drawRhombus(xg, yg, thickAngle, '#4CAF50');
+
+        // 黄色ひし形（thin）は緑ひし形の隣にずらして描画
+        let xt = xg + side * Math.cos(deg2rad(thickAngle));
+        let yt = yg + side * Math.sin(deg2rad(thickAngle));
+        drawRhombus(xt, yt, thinAngle, '#FFC107');
     }
 }
 </script>
