@@ -13,6 +13,11 @@ app.get("/randomness/coin_hex", (req, res) => {
   res.sendFile(path.join(__dirname, "static/randomness/pt_coin_hex.html"));
 });
 
+app.get("/base/tmp", (req, res) => {
+//   res.send("Hello World! Node.js Web App is running");
+  res.sendFile(path.join(__dirname, "static/base/tmp.html"));
+});
+
 
 // サーバーを起動
 app.listen(port, () => {

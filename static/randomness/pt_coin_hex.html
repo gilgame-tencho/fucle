@@ -107,6 +107,23 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (vertices === 6) {
+        // array
+        const hex_r = Math.sqrt(3)*radius / 2;
+        // const ax_max = Math.ceil((canvas.width - radius) / (radius * 2)) + 1;
+        // const ay_max = Math.ceil((canvas.height - radius) / (radius * 2)) + 1;
+        const ax_max = Math.ceil((canvas.width - hex_r) / (hex_r * 2)) + 1;
+        const ay_max = Math.ceil((canvas.height - radius) / 1.5);
+        let ary = [];
+        for(let i = 0; i < ay_max; i++) {
+          ary[i] = [];
+          for(let j = 0; j < ax_max; j++) {
+            ary[i][j] = i;
+          }
+        }
+        console.log(ax_max);
+        console.log(ay_max);
+        console.log(ary);
+
         // 六角形タイル
         const dx = radius * Math.sqrt(3); // 横方向の間隔
         const dy = radius * 1.5;          // 縦方向の間隔
