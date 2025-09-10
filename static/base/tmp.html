@@ -2,10 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Regular Rhombs Pattern</title>
+<title>Regular Rhombs Canvas</title>
 </head>
 <body>
-<canvas id="canvas" width="600" height="600"></canvas>
+<canvas id="canvas" width="500" height="500"></canvas>
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -13,49 +13,54 @@ const ctx = canvas.getContext('2d');
 // 辺の長さ
 const side = 40;
 
-// Rhomb 描画関数（中心座標と角度指定）
-function drawRhombus(x, y, angleA, color){
+// ラジアン変換
+function deg2rad(deg){ return deg * Math.PI / 180; }
+
+// ひし形描画関数（中心座標と2つの角度）
+function drawRhombus(cx, cy, angleA, color) {
     const angleB = 180 - angleA;
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    let x1 = x + side * Math.cos(deg2rad(angleA));
-    let y1 = y + side * Math.sin(deg2rad(angleA));
+    ctx.moveTo(cx, cy);
+    // 4頂点を順番に計算
+    const x0 = cx + side * Math.cos(deg2rad(angleA/2));
+    const y0 = cy - side * Math.sin(deg2rad(angleA/2));
+
+    const x1 = x0 + side * Math.cos(deg2rad(180 - angleA));
+    const y1 = y0 + side * Math.sin(deg2rad(180 - angleA));
+
+    const x2 = cx - side * Math.cos(deg2rad(angleA/2));
+    const y2 = cy + side * Math.sin(deg2rad(angleA/2));
+
+    const x3 = cx + side * Math.cos(deg2rad(180 - angleA)) - side * Math.cos(deg2rad(angleA/2));
+    const y3 = cy + side * Math.sin(deg2rad(180 - angleA)) - side * Math.sin(deg2rad(angleA/2));
+
+    ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
-
-    let x2 = x1 + side * Math.cos(deg2rad(angleB + angleA));
-    let y2 = y1 + side * Math.sin(deg2rad(angleB + angleA));
-    ctx.lineTo(x2, y2);
-
-    let x3 = x + side * Math.cos(deg2rad(angleB));
-    let y3 = y + side * Math.sin(deg2rad(angleB));
     ctx.lineTo(x3, y3);
-
+    ctx.lineTo(x2, y2);
     ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
 }
 
-function deg2rad(deg){ return deg * Math.PI / 180; }
-
 // 角度設定
-const thickAngle = 72;  // 緑
-const thinAngle = 36;   // 黄
+const thick = 72; // 緑
+const thin = 36;  // 黄
 
-// 配置用ループ（互い違い）
+// 配置（近似）
 const rows = 8;
 const cols = 8;
+for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+        // 緑ひし形
+        let gx = col * side * 1.5;
+        let gy = row * side * 0.9;
+        drawRhombus(gx, gy, thick, '#4CAF50');
 
-for(let row=0; row<rows; row++){
-    for(let col=0; col<cols; col++){
-        // 緑ひし形（thick）
-        let xg = col * side * 1.5;
-        let yg = row * side * Math.sin(deg2rad(thickAngle));
-        drawRhombus(xg, yg, thickAngle, '#4CAF50');
-
-        // 黄色ひし形（thin）は緑ひし形の隣にずらして描画
-        let xt = xg + side * Math.cos(deg2rad(thickAngle));
-        let yt = yg + side * Math.sin(deg2rad(thickAngle));
-        drawRhombus(xt, yt, thinAngle, '#FFC107');
+        // 黄色ひし形は緑ひし形に隣接してずらして描画
+        let tx = gx + side * Math.cos(deg2rad(thick/2));
+        let ty = gy + side * Math.sin(deg2rad(thick/2));
+        drawRhombus(tx, ty, thin, '#FFC107');
     }
 }
 </script>
