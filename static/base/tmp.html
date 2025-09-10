@@ -1,113 +1,55 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Penrose Tiling (Rhombus, Radial)</title>
-  <style>
-    body { background:#111; color:#eee; text-align:center; font-family:sans-serif; }
-    canvas { border:1px solid #444; margin-top:10px; background:#000; }
-    .controls { margin:10px; }
-  </style>
+<meta charset="UTF-8">
+<title>Periodic Rhombs Pattern</title>
 </head>
 <body>
-  <h1>ペンローズ菱形タイル (放射状)</h1>
-  <div class="controls">
-    <label>サイズ: <input id="size" type="number" value="200"></label>
-    <label>反復: <input id="steps" type="number" value="5" min="1" max="7"></label>
-    <button onclick="draw()">描画</button>
-    <button onclick="download()">ダウンロード</button>
-  </div>
-  <canvas id="canvas" width="800" height="800"></canvas>
+<canvas id="canvas" width="500" height="500"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const phi = (1 + Math.sqrt(5)) / 2;
+// Rhomb タイルのサイズ
+const shortDiag = 30;  // 短い対角線
+const longDiag = 60;   // 長い対角線
 
-    class Rhombus {
-      constructor(type, ax, ay, bx, by) {
-        this.type = type; // "thin" or "thick"
-        this.ax = ax; this.ay = ay;
-        this.bx = bx; this.by = by;
-      }
+// 2種類のひし形定義
+const rhombs = [
+  { w: longDiag, h: shortDiag, color: '#4CAF50' }, // 「thin rhomb」
+  { w: longDiag, h: longDiag, color: '#FFC107' }  // 「thick rhomb」
+];
 
-      // 分割ルール
-      subdivide() {
-        const { type, ax, ay, bx, by } = this;
-        const vx = bx - ax, vy = by - ay;
-        const len = Math.sqrt(vx*vx + vy*vy);
-        const ux = vx / len, uy = vy / len;
-        const mx = ax + vx/phi, my = ay + vy/phi;
+// ひし形を描く関数
+function drawRhomb(x, y, w, h, rotation=0, color='#000') {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.beginPath();
+    ctx.moveTo(0, -h/2);    // 上
+    ctx.lineTo(w/2, 0);     // 右
+    ctx.lineTo(0, h/2);     // 下
+    ctx.lineTo(-w/2, 0);    // 左
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+}
 
-        if (type === "thick") {
-          return [
-            new Rhombus("thick", bx, by, mx, my),
-            new Rhombus("thin", mx, my, ax, ay)
-          ];
-        } else {
-          return [
-            new Rhombus("thin", ax, ay, mx, my),
-            new Rhombus("thick", mx, my, bx, by)
-          ];
-        }
-      }
+// 簡易的に周期タイルを配置（例: 斜めグリッド）
+const rows = 10;
+const cols = 10;
 
-      draw(ctx, cx, cy) {
-        const { type, ax, ay, bx, by } = this;
-        const color = (type === "thick") ? "#ff9966" : "#66ccff";
-
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + ax, cy + ay);
-        ctx.lineTo(cx + bx, cy + by);
-        ctx.closePath();
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = "#222";
-        ctx.stroke();
-      }
+for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+        const x = col * longDiag * 0.75;
+        const y = row * shortDiag + (col % 2) * (shortDiag/2);
+        
+        // 2種類のひし形を交互に配置
+        const rhomb = (row + col) % 2 === 0 ? rhombs[0] : rhombs[1];
+        drawRhomb(x, y, rhomb.w, rhomb.h, 0, rhomb.color);
     }
-
-    function generatePenrose(size, steps) {
-      let tiles = [];
-      const cx = 0, cy = 0;
-
-      // 初期: 厚い菱形を5枚並べて星型を作る
-      for (let i = 0; i < 5; i++) {
-        const angle1 = (i * 2 * Math.PI) / 5;
-        const angle2 = ((i+1) * 2 * Math.PI) / 5;
-        const ax = size * Math.cos(angle1), ay = size * Math.sin(angle1);
-        const bx = size * Math.cos(angle2), by = size * Math.sin(angle2);
-        tiles.push(new Rhombus("thick", ax, ay, bx, by));
-      }
-
-      // 分割を繰り返す
-      for (let s = 0; s < steps; s++) {
-        tiles = tiles.flatMap(t => t.subdivide());
-      }
-
-      return tiles;
-    }
-
-    function draw() {
-      const size = +document.getElementById('size').value;
-      const steps = +document.getElementById('steps').value;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const tiles = generatePenrose(size, steps);
-      const cx = canvas.width/2, cy = canvas.height/2;
-
-      tiles.forEach(t => t.draw(ctx, cx, cy));
-    }
-
-    function download() {
-      const a = document.createElement('a');
-      a.download = 'penrose_radial.png';
-      a.href = canvas.toDataURL();
-      a.click();
-    }
-
-    draw();
-  </script>
+}
+</script>
 </body>
 </html>
