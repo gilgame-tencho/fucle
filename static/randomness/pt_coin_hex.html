@@ -66,7 +66,7 @@
     </label>
     <label>
       半径:
-      <input type="number" id="radius" value="20" min="10" max="300">
+      <input type="number" id="radius" value="60" min="10" max="300">
     </label>
     <button id="drawBtn" onclick="drawTiling()">描画</button>
   </div>
@@ -109,11 +109,13 @@
 
       if (vertices === 6) {
         // array
-        const hex_r = Math.sqrt(3)*radius / 2;
-        // const ax_max = Math.ceil((canvas.width - radius) / (radius * 2)) + 1;
-        // const ay_max = Math.ceil((canvas.height - radius) / (radius * 2)) + 1;
-        const ax_max = Math.ceil((canvas.width - hex_r) / (hex_r * 2)) + 1;
-        const ay_max = Math.ceil((canvas.height - radius) / 1.5);
+        let total_var = (6-2)*180/6;
+        let rad = 15 * Math.PI / 180;
+        let hex_r = Math.cos(rad) * radius; // 六角形の横幅半分
+        let step = Math.sin(rad) * radius; // 六角形のTopから肩までの高さ
+
+        let ax_max = Math.ceil((canvas.width - hex_r) / (hex_r * 2)) + 1;
+        let ay_max = Math.ceil((canvas.height - (radius / 2)) / (step + radius)) + 1;
         let ary = [];
         for(let i = 0; i < ay_max; i++) {
           ary[i] = [];
@@ -124,6 +126,10 @@
         console.log(ax_max);
         console.log(ay_max);
         console.log(ary);
+        console.log((canvas.width));
+        console.log((hex_r));
+        console.log((canvas.width - hex_r));
+        console.log((canvas.width - hex_r) / (hex_r * 2));
 
         // 六角形タイル
         const dx = radius * Math.sqrt(3); // 横方向の間隔
