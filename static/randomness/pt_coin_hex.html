@@ -99,6 +99,28 @@
       ctx.fill();
     }
 
+    function drawLine(x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.closePath();
+      ctx.strokeStyle = "#cc0077";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    function drawLines(ps) {
+      ctx.beginPath();
+      ctx.moveTo(ps[0][0], ps[0][1]);
+      for(let i = 1; i < ps.length; i++){
+        ctx.lineTo(ps[i][0], ps[i][1]);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = "#cc0077";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
     // タイル模様を描画
     function drawTiling() {
       const vertices = parseInt(document.getElementById("vertices").value, 10);
@@ -110,7 +132,7 @@
       if (vertices === 6) {
         // array
         let total_var = (6-2)*180/6;
-        let rad = 15 * Math.PI / 180;
+        let rad = 30 * Math.PI / 180;
         let hex_r = Math.cos(rad) * radius; // 六角形の横幅半分
         let step = Math.sin(rad) * radius; // 六角形のTopから肩までの高さ
 
@@ -123,13 +145,21 @@
             ary[i][j] = i;
           }
         }
-        console.log(ax_max);
-        console.log(ay_max);
+        console.log(`ax_max: ${ax_max}`);
+        console.log(`ay_max: ${ay_max}`);
         console.log(ary);
-        console.log((canvas.width));
-        console.log((hex_r));
-        console.log((canvas.width - hex_r));
-        console.log((canvas.width - hex_r) / (hex_r * 2));
+        console.log(`canvas.width: ${canvas.width}`);
+        console.log(`Math.cos(rad): ${Math.cos(rad)}`);
+        console.log(`Math.sin(rad): ${Math.sin(rad)}`);
+        console.log(`hex_r: ${hex_r}`);
+        console.log(`(canvas.width - hex_r): ${(canvas.width - hex_r)}`);
+        console.log(`(canvas.width - hex_r) / (hex_r * 2): ${(canvas.width - hex_r) / (hex_r * 2)}`);
+        drawLine(50,50, 50+radius, 50);
+        drawLine(50,50, 50, 50+radius);
+        let dev_b = hex_r *2;
+        drawLine(dev_b,dev_b, dev_b+hex_r, dev_b);
+        dev_b = hex_r *2 + hex_r;
+        drawLine(dev_b,hex_r *2, dev_b, hex_r *2+hex_r);
 
         // 六角形タイル
         const dx = radius * Math.sqrt(3); // 横方向の間隔
