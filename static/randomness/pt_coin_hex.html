@@ -79,7 +79,7 @@
     const ctx = canvas.getContext("2d");
 
     // 単一の正多角形を描画する
-    function drawPolygon(x, y, radius, vertices) {
+    function drawPolygon(x, y, radius, vertices, colors) {
       ctx.beginPath();
       for (let i = 0; i <= vertices; i++) {
         const angle = (i * 2 * Math.PI) / vertices - Math.PI / 2;
@@ -92,10 +92,12 @@
         }
       }
       ctx.closePath();
-      ctx.strokeStyle = "#0077cc";
+      // ctx.strokeStyle = "#0077cc";
+      ctx.strokeStyle = colors.line;
       ctx.lineWidth = 1.5;
       ctx.stroke();
-      ctx.fillStyle = "rgba(0,119,204,0.08)";
+      // ctx.fillStyle = "rgba(0,119,204,0.08)";
+      ctx.fillStyle = colors.fill;
       ctx.fill();
     }
 
@@ -121,6 +123,8 @@
       ctx.stroke();
     }
 
+    let colors = {line : "#0077cc", fill : "rgba(0,119,204,0.08)"}
+
     // タイル模様を描画
     function drawTiling() {
       const vertices = parseInt(document.getElementById("vertices").value, 10);
@@ -142,7 +146,7 @@
         for(let i = 0; i < ay_max; i++) {
           ary[i] = [];
           for(let j = 0; j < ax_max; j++) {
-            ary[i][j] = i;
+            ary[i][j] = Math.round(Math.random(),0);
           }
         }
         console.log(`ax_max: ${ax_max}`);
@@ -164,12 +168,18 @@
         // 六角形タイル
         const dx = radius * Math.sqrt(3); // 横方向の間隔
         const dy = radius * 1.5;          // 縦方向の間隔
+        // colors = {line : "#0077cc", fill : "rgba(0,119,204,0.08)"};
+        let local_colors = {line : "#0077cc", fill : "rgba(0,119,204,0.4)"};
 
         for (let row = 0; row < Math.ceil(canvas.height / dy) + 1; row++) {
           for (let col = 0; col < Math.ceil(canvas.width / dx) + 1; col++) {
             const x = col * dx + (row % 2) * (dx / 2);
             const y = row * dy;
-            drawPolygon(x, y, radius, vertices);
+            if(ary[row][col] == 0){
+              drawPolygon(x, y, radius, vertices, colors);
+            }else{
+              drawPolygon(x, y, radius, vertices, local_colors);
+            }
           }
         }
       } else if (vertices === 4) {
@@ -180,7 +190,7 @@
           for (let col = 0; col < Math.ceil(canvas.width / dx) + 1; col++) {
             const x = col * dx + radius;
             const y = row * dy + radius;
-            drawPolygon(x, y, radius, vertices);
+            drawPolygon(x, y, radius, vertices, colors);
           }
         }
       } else if (vertices === 3) {
@@ -191,12 +201,12 @@
           for (let col = 0; col < Math.ceil(canvas.width / dx) + 1; col++) {
             const x = col * dx + (row % 2) * (dx / 2);
             const y = row * dy;
-            drawPolygon(x, y, radius, vertices);
+            drawPolygon(x, y, radius, vertices, colors);
           }
         }
       } else {
         // その他の多角形 → 中央だけ描画（敷き詰め不可）
-        drawPolygon(canvas.width / 2, canvas.height / 2, radius, vertices);
+        drawPolygon(canvas.width / 2, canvas.height / 2, radius, vertices, colors);
       }
     }
 
